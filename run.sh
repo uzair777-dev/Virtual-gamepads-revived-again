@@ -42,4 +42,4 @@ echo "IP Address: ${IP_ADDRESSES}"
 echo "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 
 # Run virtual gamepad server
-sudo $SCRIPT_DIR/.18/bin/node $SCRIPT_DIR/main.js
+sudo $(which node) $SCRIPT_DIR/main.js
