@@ -131,6 +131,10 @@
   // ==============================
   //  BUTTON BINDING
   // ==============================
+  function vibrate() {
+    if (navigator.vibrate) navigator.vibrate(50);
+  }
+
   function bindButtons() {
     // Face, bumper, menu, guide buttons (EV_KEY)
     var keyBtns = document.querySelectorAll('.xbtn[data-code]');
@@ -141,6 +145,7 @@
       function press(e) {
         e.preventDefault();
         e.stopPropagation();
+        vibrate();
         btn.classList.add('xbtn-pressed');
         emit(EV_KEY, code, 1);
       }
@@ -168,6 +173,7 @@
 
       function press(e) {
         e.preventDefault();
+        vibrate();
         btn.classList.add('xbtn-pressed');
         emit(EV_ABS, axis, val);
       }
@@ -199,6 +205,7 @@
 
       function press(e) {
         e.preventDefault();
+        vibrate();
         btn.classList.add('xbtn-pressed');
         emit(EV_ABS, axis, val);
       }
@@ -260,6 +267,35 @@
   window.toggleDarkMode = function() {
     document.body.classList.toggle('xinput-dark');
   };
+
+  // ==============================
+  //  WAKE LOCK (Keep Screen Awake)
+  // ==============================
+  var wakeLock = null;
+  var requestWakeLock = function() {
+    if ('wakeLock' in navigator) {
+      navigator.wakeLock.request('screen')
+        .then(function(lock) {
+          wakeLock = lock;
+          wakeLock.addEventListener('release', function() {
+            console.log('Wake Lock released');
+          });
+          console.log('Wake Lock is active');
+        })
+        .catch(function(err) {
+          console.error(err.name + ', ' + err.message);
+        });
+    }
+  };
+
+  document.addEventListener('visibilitychange', function() {
+    if (wakeLock !== null && document.visibilityState === 'visible') {
+      requestWakeLock();
+    }
+  });
+
+  document.body.addEventListener('click', requestWakeLock, { once: true });
+  document.body.addEventListener('touchstart', requestWakeLock, { once: true });
 
   // ==============================
   //  FULLSCREEN

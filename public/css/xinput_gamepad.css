@@ -18,11 +18,11 @@ html, body {
 }
 
 body {
-  background: #1a1a2e;
+  background: #e6e6e6; /* Xbox 360 Light Gray */
 }
 
 body.xinput-dark {
-  background: #0a0a0f;
+  background: #000000;
 }
 
 /* ---- Root layout ---- */
@@ -35,12 +35,10 @@ body.xinput-dark {
 
 /* ---- Slot indicator ---- */
 #xinput-slot-indicator {
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
-  gap: 6px;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
   z-index: 20;
 }
 .xinput-ind {
@@ -89,7 +87,15 @@ body.xinput-dark {
   flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
-  width: 42%;
+}
+
+.xinput-col-left, .xinput-col-right {
+  flex: 1;
+}
+
+.xinput-col-center {
+  flex: 0 0 auto;
+  justify-content: center;
 }
 
 /* ---- Stick zones ---- */
@@ -197,32 +203,29 @@ body.xinput-dark {
   justify-content: center;
 }
 
-.xbtn-y { top: 0;   left: 38px; background: linear-gradient(135deg, #f5d623, #c9a800); color: #222; }
-.xbtn-a { bottom:0; left: 38px; background: linear-gradient(135deg, #4caf50, #2e7d32); }
-.xbtn-x { top: 38px; left: 0;   background: linear-gradient(135deg, #42a5f5, #1565c0); }
-.xbtn-b { top: 38px; right: 0;  background: linear-gradient(135deg, #ef5350, #b71c1c); }
+.xbtn-y { top: 0;   left: 38px; background: linear-gradient(135deg, #fae075, #dfbc21); color: #222; }
+.xbtn-a { bottom:0; left: 38px; background: linear-gradient(135deg, #7ad57e, #4ea352); }
+.xbtn-x { top: 38px; left: 0;   background: linear-gradient(135deg, #74c1fa, #3895e6); }
+.xbtn-b { top: 38px; right: 0;  background: linear-gradient(135deg, #f77a7a, #d44848); }
 
 /* ---- Bumpers & Triggers ---- */
-.xbtn-bumper {
-  padding: 8px 18px;
-  border-radius: 8px;
-  background: #444;
-  color: #ddd;
-  border: 1px solid #555;
+.xbtn-bumper, .xbtn-trigger {
+  padding: 14px 24px;
+  border-radius: 10px;
+  background: #eaeaea;
+  color: #333;
+  border: 1px solid #ccc;
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.xbtn-trigger {
-  padding: 8px 18px;
-  border-radius: 8px;
-  background: #2a2a2a;
-  color: #bbb;
+body.xinput-dark .xbtn-bumper, body.xinput-dark .xbtn-trigger {
+  background: #333;
+  color: #ddd;
   border: 1px solid #555;
-  font-weight: bold;
-  font-size: 0.9rem;
-  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 /* ---- Menu buttons ---- */
