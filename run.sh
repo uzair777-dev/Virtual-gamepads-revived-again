@@ -11,6 +11,17 @@ IP_ADDRESS=$(cut -d" " -f1 <<< $IP_ADDRESSES)
 
 clear
 
+# Auto-check and fix npm dependencies for future-proofing
+echo "Checking npm dependencies..."
+cd "$SCRIPT_DIR"
+# npm ls returns an error code if dependencies are missing or mismatched
+if ! npm ls >/dev/null 2>&1; then
+	echo "Missing or broken dependencies detected. Installing/fixing automatically..."
+	# Remove node_modules and package-lock to avoid frozen broken states
+	rm -rf package-lock.json node_modules
+	npm install
+fi
+
 # IP exist or not
 if [ -z "$IP_ADDRESS" ]; then
 	echo "IP address is not detected!"
