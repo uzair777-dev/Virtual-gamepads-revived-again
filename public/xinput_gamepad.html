@@ -10,24 +10,19 @@
 <body>
   <div id="xinput-controller">
 
-    <!-- Slot indicator -->
-    <div id="xinput-slot-indicator">
-      <div id="xinput_ind_1" class="xinput-ind"></div>
-      <div id="xinput_ind_2" class="xinput-ind"></div>
-      <div id="xinput_ind_3" class="xinput-ind"></div>
-      <div id="xinput_ind_4" class="xinput-ind"></div>
-    </div>
 
-    <!-- Top bar: Bumpers, Triggers, Menu buttons -->
+    <!-- Top bar: Bumpers, Triggers, Slot Indicators -->
     <div class="xinput-top-bar">
       <div class="xinput-shoulder-group">
         <button class="xbtn xbtn-bumper" data-code="0x136" id="xbtn-lb">LB</button>
         <button class="xbtn xbtn-trigger" data-axis="0x02" data-val="255" id="xbtn-lt">LT</button>
       </div>
-      <div class="xinput-menu-group">
-        <button class="xbtn xbtn-menu" data-code="0x13a" id="xbtn-back">⊞</button>
-        <button class="xbtn xbtn-guide" data-code="0x13c" id="xbtn-guide">ⓧ</button>
-        <button class="xbtn xbtn-menu" data-code="0x13b" id="xbtn-start">☰</button>
+      <!-- Slot indicator moved to top bar -->
+      <div id="xinput-slot-indicator">
+        <div id="xinput_ind_1" class="xinput-ind"></div>
+        <div id="xinput_ind_2" class="xinput-ind"></div>
+        <div id="xinput_ind_3" class="xinput-ind"></div>
+        <div id="xinput_ind_4" class="xinput-ind"></div>
       </div>
       <div class="xinput-shoulder-group">
         <button class="xbtn xbtn-trigger" data-axis="0x05" data-val="255" id="xbtn-rt">RT</button>
@@ -53,6 +48,15 @@
           <div class="xinput-dpad-center"></div>
           <button class="xbtn xbtn-dpad xbtn-dpad-r" data-hat-axis="0x10" data-hat-val="1">▶</button>
           <button class="xbtn xbtn-dpad xbtn-dpad-d" data-hat-axis="0x11" data-hat-val="1">▼</button>
+        </div>
+      </div>
+
+      <!-- CENTER column for Menu Buttons -->
+      <div class="xinput-col xinput-col-center">
+        <div class="xinput-menu-group" style="flex-direction: row; gap: 12px; white-space: nowrap;">
+          <button class="xbtn xbtn-menu" data-code="0x13a" id="xbtn-back">⊞</button>
+          <button class="xbtn xbtn-guide" data-code="0x13c" id="xbtn-guide">ⓧ</button>
+          <button class="xbtn xbtn-menu" data-code="0x13b" id="xbtn-start">☰</button>
         </div>
       </div>
 
