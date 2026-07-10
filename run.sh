@@ -11,6 +11,17 @@ IP_ADDRESS=$(cut -d" " -f1 <<< $IP_ADDRESSES)
 
 clear
 
+# Auto-check and fix npm dependencies for future-proofing
+echo "Checking npm dependencies..."
+cd "$SCRIPT_DIR"
+# npm ls returns an error code if dependencies are missing or mismatched
+if ! npm ls >/dev/null 2>&1; then
+	echo "Missing or broken dependencies detected. Installing/fixing automatically..."
+	# Remove node_modules and package-lock to avoid frozen broken states
+	rm -rf package-lock.json node_modules
+	npm install
+fi
+
 # IP exist or not
 if [ -z "$IP_ADDRESS" ]; then
 	echo "IP address is not detected!"
@@ -41,5 +52,25 @@ echo "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 echo "IP Address: ${IP_ADDRESSES}"
 echo "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 
+cleanup() {
+	trap - EXIT INT TERM
+	echo "Closing port 80..."
+	if command -v firewall-cmd &>/dev/null; then
+		sudo firewall-cmd --remove-port=80/tcp > /dev/null
+	elif command -v ufw &>/dev/null; then
+		sudo ufw delete allow 80/tcp > /dev/null
+	fi
+}
+
+if command -v firewall-cmd &>/dev/null; then
+	echo "Temporarily opening port 80 in firewalld..."
+	sudo firewall-cmd --add-port=80/tcp > /dev/null
+	trap cleanup EXIT INT TERM HUP
+elif command -v ufw &>/dev/null; then
+	echo "Temporarily opening port 80 in ufw..."
+	sudo ufw allow 80/tcp > /dev/null
+	trap cleanup EXIT INT TERM HUP
+fi
+
 # Run virtual gamepad server
-sudo $SCRIPT_DIR/.18/bin/node $SCRIPT_DIR/main.js
+sudo $(which node) $SCRIPT_DIR/main.js
