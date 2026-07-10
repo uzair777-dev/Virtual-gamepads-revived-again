@@ -41,15 +41,24 @@ echo "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 echo "IP Address: ${IP_ADDRESSES}"
 echo "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 
-# Temporarily open port 80 in firewall
+cleanup() {
+	trap - EXIT INT TERM
+	echo "Closing port 80..."
+	if command -v firewall-cmd &>/dev/null; then
+		sudo firewall-cmd --remove-port=80/tcp > /dev/null
+	elif command -v ufw &>/dev/null; then
+		sudo ufw delete allow 80/tcp > /dev/null
+	fi
+}
+
 if command -v firewall-cmd &>/dev/null; then
 	echo "Temporarily opening port 80 in firewalld..."
 	sudo firewall-cmd --add-port=80/tcp > /dev/null
-	trap 'sudo firewall-cmd --remove-port=80/tcp > /dev/null; exit' EXIT INT TERM
+	trap cleanup EXIT INT TERM HUP
 elif command -v ufw &>/dev/null; then
 	echo "Temporarily opening port 80 in ufw..."
 	sudo ufw allow 80/tcp > /dev/null
-	trap 'sudo ufw delete allow 80/tcp > /dev/null; exit' EXIT INT TERM
+	trap cleanup EXIT INT TERM HUP
 fi
 
 # Run virtual gamepad server
