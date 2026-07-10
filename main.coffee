@@ -6,11 +6,18 @@ Virtual gamepad application
 forever = require('forever-monitor')
 log = require './lib/log'
 
+options =
+  max: Infinity
+  args: []
+
+if process.env.HOT_RELOAD
+  options.watch = true
+  options.watchDirectory = __dirname
+  log 'info', 'Hot reload is ENABLED (watching for file changes)'
+
 server = new (forever.Monitor)(
-  require('path').resolve(__dirname, 'server.js'), {
-    max: Infinity,
-    args: [],
-});
+  require('path').resolve(__dirname, 'server.js'), options
+)
 
 exiting = false
 
@@ -36,7 +43,13 @@ for sig in ['SIGTERM', 'SIGINT', 'exit']
   process.on sig, ((s) -> ->
     log 'info', 'received ' + s
     exiting = true
-    server.stop()
+    try
+      if server.running
+        server.stop()
+    catch e
+      log 'error', e.message
+    if s != 'exit'
+      process.exit(0)
   )(sig)
 
 

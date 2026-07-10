@@ -96,12 +96,15 @@ elif command -v ufw &>/dev/null; then
 	trap cleanup EXIT INT TERM HUP
 fi
 
+HOT_RELOAD_ENV=""
 DEBUG_ENV=""
 for arg in "$@"; do
 	if [ "$arg" == "--debug" ]; then
 		DEBUG_ENV="LOGLEVEL=debug"
+	elif [ "$arg" == "--hot-reload" ]; then
+		HOT_RELOAD_ENV="HOT_RELOAD=1"
 	fi
 done
 
 # Run virtual gamepad server
-sudo bash -c "$DEBUG_ENV $(which node) $SCRIPT_DIR/main.js"
+sudo bash -c "$HOT_RELOAD_ENV $DEBUG_ENV $(which node) $SCRIPT_DIR/main.js"

@@ -12,12 +12,20 @@ Virtual gamepad application
 
   log = require("./lib/log");
 
+  var options = {
+    max: Infinity,
+    args: ["--https", "--key", "key.pem", "--cert", "cert.pem"],
+  };
+
+  if (process.env.HOT_RELOAD) {
+    options.watch = true;
+    options.watchDirectory = __dirname;
+    log("info", "Hot reload is ENABLED (watching for file changes)");
+  }
+
   server = new forever.Monitor(
     require("path").resolve(__dirname, "server.js"),
-    {
-      max: Infinity,
-      args: ["--https", "--key", "key.pem", "--cert", "cert.pem"],
-    },
+    options
   );
 
   exiting = false;
@@ -59,7 +67,16 @@ Virtual gamepad application
         return function() {
           log("info", "received " + s);
           exiting = true;
-          return server.stop();
+          try {
+            if (server.running) {
+              server.stop();
+            }
+          } catch (e) {
+            log("error", e.message);
+          }
+          if (s !== "exit") {
+            return process.exit(0);
+          }
         };
       })(sig),
     );
