@@ -4,6 +4,27 @@
    any collision with the base style.css
    ============================================ */
 
+/* ---- Responsive sizing variables ----
+   All element sizes are derived from viewport dimensions.
+   vmin = the smaller of vw/vh, so landscape phones use vh,
+   which naturally keeps things from overflowing.
+   ---------------------------------------- */
+:root {
+  /* Core sizing unit — scales with the smallest viewport edge */
+  --stick-size:      clamp(80px, 22vmin, 150px);
+  --knob-size:       clamp(36px, 10vmin, 70px);
+  --face-group-size: clamp(80px, 22vmin, 140px);
+  --face-btn-size:   clamp(30px, 8vmin,  52px);
+  --dpad-cell:       clamp(28px, 7vmin,  48px);
+  --shoulder-pad-v:  clamp(8px,  2vmin,  16px);
+  --shoulder-pad-h:  clamp(14px, 4vmin,  28px);
+  --shoulder-font:   clamp(0.75rem, 2vmin, 1.15rem);
+  --menu-pad-v:      clamp(4px,  1.5vmin, 10px);
+  --menu-pad-h:      clamp(10px, 3vmin,   18px);
+  --guide-size:      clamp(32px, 8vmin,  48px);
+  --col-padding:     clamp(8px,  3vw,    28px);
+}
+
 /* Reset & base */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -42,11 +63,12 @@ body.xinput-amoled {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: clamp(6px, 2vmin, 14px);
   z-index: 20;
 }
 .xinput-ind {
-  width: 8px; height: 16px;
+  width: clamp(6px, 1.5vmin, 10px);
+  height: clamp(10px, 3vmin, 18px);
   background: #333;
   border-radius: 3px;
   transition: background 0.3s, box-shadow 0.3s;
@@ -59,10 +81,10 @@ body.xinput-amoled {
 /* ---- Player banner ---- */
 .xinput-player-banner {
   text-align: center;
-  font-size: 1.3rem;
+  font-size: clamp(0.9rem, 2.5vmin, 1.4rem);
   font-weight: 800;
   letter-spacing: 1px;
-  padding: 6px 0 2px 0;
+  padding: clamp(2px, 1vmin, 6px) 0 clamp(1px, 0.5vmin, 3px) 0;
   transition: color 0.3s, text-shadow 0.3s;
 }
 
@@ -95,9 +117,9 @@ body.xinput-amoled .xinput-player-connecting {
 /* ---- Connection status ---- */
 .xinput-connection-status {
   text-align: center;
-  font-size: 0.75rem;
+  font-size: clamp(0.6rem, 1.5vmin, 0.8rem);
   font-weight: 600;
-  padding-bottom: 4px;
+  padding-bottom: clamp(2px, 0.5vmin, 4px);
   transition: color 0.3s;
 }
 
@@ -119,19 +141,19 @@ body.xinput-amoled .xinput-status-disconnected {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 12px;
+  padding: clamp(3px, 1vmin, 8px) clamp(6px, 2vw, 14px);
   flex: 0 0 auto;
-  min-height: 48px;
+  min-height: clamp(36px, 8vmin, 52px);
 }
 
 .xinput-shoulder-group {
   display: flex;
-  gap: 6px;
+  gap: clamp(4px, 1vmin, 8px);
 }
 
 .xinput-menu-group {
   display: flex;
-  gap: 10px;
+  gap: clamp(6px, 2vmin, 12px);
   align-items: center;
 }
 
@@ -140,7 +162,7 @@ body.xinput-amoled .xinput-status-disconnected {
   flex: 1 1 auto;
   display: flex;
   justify-content: space-between;
-  padding: 4px 8px;
+  padding: clamp(2px, 0.5vmin, 6px) clamp(4px, 1vw, 10px);
   min-height: 0;
 }
 
@@ -154,13 +176,13 @@ body.xinput-amoled .xinput-status-disconnected {
 .xinput-col-left {
   flex: 1;
   align-items: flex-start;
-  padding-left: 24px;
+  padding-left: var(--col-padding);
 }
 
 .xinput-col-right {
   flex: 1;
   align-items: flex-end;
-  padding-right: 24px;
+  padding-right: var(--col-padding);
 }
 
 .xinput-col-center {
@@ -171,8 +193,8 @@ body.xinput-amoled .xinput-status-disconnected {
 /* ---- Stick zones ---- */
 .xinput-stick-zone {
   position: relative;
-  width: min(35vw, 130px);
-  height: min(35vw, 130px);
+  width: var(--stick-size);
+  height: var(--stick-size);
   flex-shrink: 0;
 }
 
@@ -194,8 +216,10 @@ body.xinput-dark .xinput-stick-bg, body.xinput-amoled .xinput-stick-bg {
 .xinput-stick-knob {
   position: absolute;
   top: 50%; left: 50%;
-  width: 60px; height: 60px;
-  margin-top: -30px; margin-left: -30px;
+  width: var(--knob-size);
+  height: var(--knob-size);
+  margin-top: calc(var(--knob-size) / -2);
+  margin-left: calc(var(--knob-size) / -2);
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, #eee, #ccc);
   box-shadow: 0 4px 6px rgba(0,0,0,0.2);
@@ -208,31 +232,33 @@ body.xinput-dark .xinput-stick-bg, body.xinput-amoled .xinput-stick-bg {
 }
 
 .xinput-stick-btn-wrapper {
-  margin-top: -10px;
-  margin-bottom: 10px;
+  margin-top: clamp(-8px, -1.5vmin, -4px);
+  margin-bottom: clamp(4px, 1.5vmin, 12px);
 }
 
 .xbtn-stick-click {
-  background: #333;
-  border: 1px solid #555;
-  color: #ccc;
-  font-size: 0.8rem;
-  font-weight: bold;
-  padding: 4px 16px;
+  padding: clamp(3px, 1vmin, 8px) clamp(10px, 3vmin, 18px);
   border-radius: 12px;
+  background: #eaeaea;
+  color: #333;
+  border: 1px solid #ccc;
+  font-size: clamp(0.7rem, 2vmin, 0.95rem);
+  font-weight: bold;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-.xbtn-stick-click:active {
-  background: #444;
-  color: #fff;
+body.xinput-dark .xbtn-stick-click, body.xinput-amoled .xbtn-stick-click {
+  background: #2a2a2a;
+  color: #aaa;
+  border: 1px solid #444;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
 }
 
 /* ---- D-Pad ---- */
 .xinput-dpad {
   display: grid;
-  grid-template-columns: 42px 42px 42px;
-  grid-template-rows: 42px 42px 42px;
+  grid-template-columns: var(--dpad-cell) var(--dpad-cell) var(--dpad-cell);
+  grid-template-rows: var(--dpad-cell) var(--dpad-cell) var(--dpad-cell);
   gap: 2px;
 }
 
@@ -252,7 +278,7 @@ body.xinput-dark .xinput-dpad-center, body.xinput-amoled .xinput-dpad-center {
   color: #333;
   border: 1px solid #bbb;
   border-radius: 6px;
-  font-size: 1.1rem;
+  font-size: clamp(0.8rem, 2.5vmin, 1.2rem);
   cursor: pointer;
 }
 body.xinput-dark .xbtn-dpad, body.xinput-amoled .xbtn-dpad {
@@ -269,17 +295,19 @@ body.xinput-dark .xbtn-dpad, body.xinput-amoled .xbtn-dpad {
 /* ---- Face buttons (diamond) ---- */
 .xinput-face-group {
   position: relative;
-  width: 120px; height: 120px;
+  width: var(--face-group-size);
+  height: var(--face-group-size);
 }
 
 .xbtn-face {
   position: absolute;
-  width: 44px; height: 44px;
+  width: var(--face-btn-size);
+  height: var(--face-btn-size);
   border-radius: 50%;
   border: 2px solid rgba(0,0,0,0.4);
   color: #fff;
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: clamp(0.8rem, 2.5vmin, 1.15rem);
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,0.5);
   display: flex;
@@ -287,43 +315,42 @@ body.xinput-dark .xbtn-dpad, body.xinput-amoled .xbtn-dpad {
   justify-content: center;
 }
 
-.xbtn-y { top: 0;   left: 38px; background: linear-gradient(135deg, #fae075, #dfbc21); color: #222; }
-.xbtn-a { bottom:0; left: 38px; background: linear-gradient(135deg, #7ad57e, #4ea352); }
-.xbtn-x { top: 38px; left: 0;   background: linear-gradient(135deg, #74c1fa, #3895e6); }
-.xbtn-b { top: 38px; right: 0;  background: linear-gradient(135deg, #f77a7a, #d44848); }
-
-/* ---- Stick buttons (L3 / R3) ---- */
-.xinput-stick-btn-wrapper {
-  margin-top: -10px;
+/* Position face buttons as % of the group so they scale together */
+.xbtn-y {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #fae075, #dfbc21);
+  color: #222;
 }
-
-.xbtn-stick-click {
-  padding: 6px 16px;
-  border-radius: 12px;
-  background: #eaeaea;
-  color: #333;
-  border: 1px solid #ccc;
-  font-size: 0.9rem;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.xbtn-a {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #7ad57e, #4ea352);
 }
-body.xinput-dark .xbtn-stick-click, body.xinput-amoled .xbtn-stick-click {
-  background: #2a2a2a;
-  color: #aaa;
-  border: 1px solid #444;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+.xbtn-x {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #74c1fa, #3895e6);
+}
+.xbtn-b {
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #f77a7a, #d44848);
 }
 
 /* ---- Bumpers & Triggers ---- */
 .xbtn-bumper, .xbtn-trigger {
-  padding: 14px 24px;
-  border-radius: 10px;
+  padding: var(--shoulder-pad-v) var(--shoulder-pad-h);
+  border-radius: clamp(6px, 2vmin, 12px);
   background: #eaeaea;
   color: #333;
   border: 1px solid #ccc;
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: var(--shoulder-font);
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
@@ -338,12 +365,12 @@ body.xinput-amoled .xbtn-bumper, body.xinput-amoled .xbtn-trigger {
 
 /* ---- Menu buttons ---- */
 .xbtn-menu {
-  padding: 8px 16px;
-  border-radius: 16px;
+  padding: var(--menu-pad-v) var(--menu-pad-h);
+  border-radius: clamp(10px, 3vmin, 18px);
   background: #eaeaea;
   color: #333;
   border: 1px solid #ccc;
-  font-size: 0.95rem;
+  font-size: clamp(0.75rem, 2vmin, 1rem);
   font-weight: bold;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -356,12 +383,13 @@ body.xinput-dark .xbtn-menu, body.xinput-amoled .xbtn-menu {
 }
 
 .xbtn-guide {
-  width: 44px; height: 44px;
+  width: var(--guide-size);
+  height: var(--guide-size);
   border-radius: 50%;
   background: radial-gradient(circle, #7ad57e, #4ea352);
   color: #fff;
   border: 2px solid #3d8240;
-  font-size: 1.2rem;
+  font-size: clamp(0.9rem, 2.5vmin, 1.3rem);
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
@@ -376,13 +404,18 @@ body.xinput-dark .xbtn-guide, body.xinput-amoled .xbtn-guide {
   filter: brightness(1.5);
   transform: scale(0.93);
 }
+/* Override transform for face buttons that already have a translate */
+.xbtn-y.xbtn-pressed { transform: translateX(-50%) scale(0.93); }
+.xbtn-a.xbtn-pressed { transform: translateX(-50%) scale(0.93); }
+.xbtn-x.xbtn-pressed { transform: translateY(-50%) scale(0.93); }
+.xbtn-b.xbtn-pressed { transform: translateY(-50%) scale(0.93); }
 
 /* ---- Utility bar ---- */
 .xinput-util-bar {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  padding: 4px;
+  gap: clamp(4px, 1.5vmin, 10px);
+  padding: clamp(2px, 0.5vmin, 6px);
   flex: 0 0 auto;
 }
 
@@ -391,8 +424,8 @@ body.xinput-dark .xbtn-guide, body.xinput-amoled .xbtn-guide {
   border: 1px solid rgba(255,255,255,0.2);
   color: #ccc;
   border-radius: 8px;
-  padding: 4px 12px;
-  font-size: 1rem;
+  padding: clamp(2px, 0.8vmin, 6px) clamp(8px, 2vmin, 14px);
+  font-size: clamp(0.8rem, 2vmin, 1.05rem);
   cursor: pointer;
 }
 .xinput-util-btn:active {
@@ -403,17 +436,3 @@ body.xinput-dark .xbtn-guide, body.xinput-amoled .xbtn-guide {
 body.xinput-dark .xbtn-bumper { background: #222; }
 body.xinput-dark .xbtn-trigger { background: #111; }
 body.xinput-dark .xinput-stick-bg { border-color: rgba(255,255,255,0.08); }
-
-/* Landscape hint for portrait phones */
-@media (orientation: portrait) and (max-width: 600px) {
-  .xinput-main { padding: 2px 4px; }
-  .xinput-stick-zone { width: 100px; height: 100px; }
-  .xinput-face-group { width: 100px; height: 100px; }
-  .xbtn-face { width: 36px; height: 36px; font-size: 0.9rem; }
-  .xbtn-y { left: 32px; }
-  .xbtn-a { left: 32px; }
-  .xbtn-x { top: 32px; }
-  .xbtn-b { top: 32px; }
-  .xinput-dpad { grid-template-columns: 30px 30px 30px; grid-template-rows: 30px 30px 30px; }
-  .xinput-stick-knob { width: 40px; height: 40px; }
-}
