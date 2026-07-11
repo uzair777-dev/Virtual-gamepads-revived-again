@@ -11,6 +11,12 @@
   var connected = false;
   var padId = null;  // Our assigned controller slot
 
+  // ---- Xbox One Routing ----
+  var isXboxOne = location.href.match(/\?type=xboxone/);
+  var connectEventName = isXboxOne ? 'connectXboxOneGamepad' : 'connectXInputGamepad';
+  var padEventName = isXboxOne ? 'xboxOnePadEvent' : 'xinputPadEvent';
+  var connectedEventName = isXboxOne ? 'xboxOneGamepadConnected' : 'xinputGamepadConnected';
+
   // ---- Event constants ----
   var EV_KEY = 0x01;
   var EV_ABS = 0x03;
@@ -26,7 +32,7 @@
   // ---- Emit helper — includes padId for server-side routing ----
   function emit(type, code, value) {
     if (!connected || padId === null) return;
-    socket.emit('xinputPadEvent', { padId: padId, type: type, code: code, value: value });
+    socket.emit(padEventName, { padId: padId, type: type, code: code, value: value });
   }
 
   // ==============================
@@ -371,6 +377,85 @@
   window.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
   // ==============================
+  //  GYRO LOGIC
+  // ==============================
+  var motionListener = false;
+  var sensitivity = 1.2;
+  var gyroX = 0;
+  var gyroY = 0;
+  var deadzone = 0.05;
+
+  function updateGyroAxes() {
+    var stickX = 0;
+    var stickY = 0;
+    if (Math.abs(gyroX) > deadzone) {
+      stickX = Math.round(Math.max(-1, Math.min(1, gyroX)) * 32767);
+    }
+    if (Math.abs(gyroY) > deadzone) {
+      stickY = Math.round(Math.max(-1, Math.min(1, gyroY)) * 32767);
+    }
+    emit(EV_ABS, ABS_RX, stickX);
+    emit(EV_ABS, ABS_RY, stickY);
+  }
+
+  function orientationUpdate(event) {
+    var alpha = event.alpha;
+    var beta = event.beta;
+    var gamma = event.gamma;
+    var xPosition = 0;
+    if (beta > 0 && gamma < 20) {
+      xPosition = beta / 70 * sensitivity;
+    } else if (beta > 0 && gamma > 20) {
+      xPosition = (180 - beta) / 70 * sensitivity;
+    } else if (beta < 0 && gamma < 20) {
+      xPosition = beta / 70 * sensitivity;
+    } else if (beta < 0 && gamma > 20) {
+      xPosition = -(180 + beta) / 70 * sensitivity;
+    }
+    var yPosition = 0;
+    if (gamma < 0) {
+      yPosition = ((gamma + 50) / 40) * sensitivity;
+    }
+    gyroX = xPosition;
+    gyroY = yPosition;
+    updateGyroAxes();
+  }
+
+  function motionUpdate(event) {
+    var acceleration = event.accelerationIncludingGravity;
+    var x = acceleration.x;
+    var y = acceleration.y;
+    var z = acceleration.z;
+    gyroX = (Math.atan2(y, Math.abs(z)) / 1.4) * sensitivity;
+    gyroY = ((Math.atan2(x, Math.abs(z)) / .6) - 1.6) * sensitivity;
+    updateGyroAxes();
+  }
+
+  window.toggleGyro = function() {
+    var btn = document.getElementById("xinput-btn-gyro");
+    if (motionListener) {
+      window.removeEventListener("devicemotion", motionUpdate, true);
+      window.removeEventListener("deviceorientation", orientationUpdate, true);
+      if (btn) btn.style.background = ""; // Reset background
+      motionListener = false;
+      // Reset stick to 0
+      emit(EV_ABS, ABS_RX, 0);
+      emit(EV_ABS, ABS_RY, 0);
+    } else if (window.DeviceMotionEvent) {
+      window.addEventListener("devicemotion", motionUpdate, true);
+      if (btn) btn.style.background = "var(--primary-color, #107c10)"; // Highlight active
+      motionListener = true;
+    } else if (window.DeviceOrientationEvent) {
+      window.addEventListener("deviceorientation", orientationUpdate, true);
+      if (btn) btn.style.background = "var(--primary-color, #107c10)"; // Highlight active
+      motionListener = true;
+    } else {
+      alert("Gyro is not supported on your device or disabled in browser settings.");
+      if (btn) btn.disabled = true;
+    }
+  };
+
+  // ==============================
   //  INIT ON LOAD
   // ==============================
   window.addEventListener('load', function() {
@@ -378,7 +463,7 @@
     updatePlayerBanner();
     updateConnectionStatus();
 
-    socket.on('xinputGamepadConnected', function(data) {
+    socket.on(connectedEventName, function(data) {
       connected = true;
       padId = data.padId;
       ledBitField = data.ledBitField;
@@ -394,8 +479,14 @@
       bindButtons();
     });
 
+    socket.on('xboxOneVibrate', function(data) {
+      if (navigator.vibrate && padId !== null) {
+        navigator.vibrate(data.duration || 100);
+      }
+    });
+
     socket.on('connect', function() {
-      socket.emit('connectXInputGamepad', null);
+      socket.emit(connectEventName, null);
     });
 
     socket.on('disconnect', function() {

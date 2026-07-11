@@ -199,13 +199,6 @@ var virtual_xboxone_gamepad = (function() {
   virtual_xboxone_gamepad.prototype.sendEvent = function(event, error) {
     var ev, ev_buffer, ev_end, ev_end_buffer;
     if (this.fd) {
-      // Map web UI 0-255 axis value to -32768 to 32767 for Xbox axes
-      if (event.type === uinput.EV_ABS && (
-          event.code === uinput.ABS_X || event.code === uinput.ABS_Y ||
-          event.code === uinput.ABS_RX || event.code === uinput.ABS_RY)) {
-        event.value = Math.round((event.value - 127) * (32767 / 127));
-      }
-
       ev = new uinputStructs.input_event();
       ev.type = event.type;
       ev.code = event.code;
