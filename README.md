@@ -11,6 +11,8 @@ This repo is a fork of [alr86/node-virtual-gamepads-revived](https://github.com/
 - XBOX-Style buttons layout with xinput support
 - ~~PreDefiend `.desktop` files to run script(needs change)~~ 
 
+View [TODO](#todo) for Upcoming stuffs 
+
 ## Install and run:
 ```bash
     git clone https://github.com/uzair777-dev/Virtual-gamepads-revived-again
@@ -110,17 +112,45 @@ To compile all coffee files when ever they change run
 If you want do add a new keyboard layout please refer to [this file](CREATE_KEYBOARD_LAYOUT.md).
 
 
-# TODO 
+## TODO 
 
-1) Server-side profile management:
+   
+
+1) Fixing Stuff First:
+
+    - [ ] Proper multi device connect 
+  
+    - [ ]  Actual Multithreading 
+
+    - [ ]  Proper Navigation for website
+
+    - [ ]  Remove depreciated stuff
+
+
+2) Adding Support for wheel:
+
+    - [ ] Steering wheel native axis support
+
+    - [ ] Pedals support
+
+    - [ ] Shifter support(Probably)
+
+    - [ ] Button mapping
+
+    - [ ] Profile support
+
+
+2) Server-side profile management:
    
     - [ ] Add a settings page to load/save/edit profiles
     
-    - [ ] Save profiles to file
+    - [ ] Save profiles to file, probabaly in ./config/controllerprofiles/ (?)
     
-    - [ ] Auto-load last profile
+    - [ ] Auto-load last profile (based on client, idk)
     
-2) Better gyro implementation:
+3) Better gyro implementation:
+
+    - [ ] Implement gyro first
 
     - [ ] Pitch/yaw smoothing
 
@@ -129,7 +159,7 @@ If you want do add a new keyboard layout please refer to [this file](CREATE_KEYB
     - [ ] Centering on button press
 
     
-3) Profile switching:
+4) Profile switching:
 
     - [ ] Quick profile toggle (LB/RB?)
 
