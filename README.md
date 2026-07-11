@@ -123,8 +123,8 @@ If you want do add a new keyboard layout please refer to [this file](CREATE_KEYB
 1) Fixing Stuff First:
     - [x] Proper multi device connect 
     - [ ]  Actual Multithreading 
-    - [ ]  Proper Navigation for website
-    - [ ]  Remove depreciated stuff
+    - [x] Proper Navigation for website
+    - [ ] Remove depreciated stuff
 
 2) Adding Support for wheel:
     - [ ] Steering wheel native axis support
