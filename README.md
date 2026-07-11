@@ -1,25 +1,25 @@
 # Node-Virtual-Gamepads-Revived ReadMe:
 
-This repo is a fork of node-virtual-gamepads with some changes(just tested in linux):
+This repo is a fork of [alr86/node-virtual-gamepads-revived](https://github.com/alr86/node-virtual-gamepads-revived) (which is a fork of [node-virtual-gamepads](https://github.com/jehervy/node-virtual-gamepads)) with ~~some~~ Many changes(just tested in linux, and will only ):
 
-- Show server QR-Code
-- Gyro support
+- ~~Show server QR-Code~~ [Unsupported currently, Doesn't work]
+- ~~Gyro support~~ [Partial, will be impelmented]
 - Dark Mode
-- An Script to test gamepads
+- An Script to test gamepads [Test pending]
 - Better styles
 - Also have "L2", "R2" & "Menu" buttons
-- XBOX-Style buttons layout
-- PreDefiend `.desktop` files to run script(needs change)
+- XBOX-Style buttons layout with xinput support
+- ~~PreDefiend `.desktop` files to run script(needs change)~~ 
 
 ## Install and run:
 ```bash
-    git clone https://github.com/alr86/node-virtual-gamepads-revived
-    cd node-virtual-gamepads-revived
+    git clone https://github.com/uzair777-dev/Virtual-gamepads-revived-again
+    cd Virtual-gamepads-revived-again
     ./run.sh
 ```
 ## ScreenShot:
 (Red L2-R2 Buttons over D-pad only works when gyro enabled)
-![Standalone installation step 1](https://github.com/alr86/node-virtual-gamepads-revived/blob/master/public/images/screenshot.jpg?raw=true)
+![Standalone installation step 1](https://github.com/uzair777-dev/Virtual-gamepads-revived-again/blob/master/public/images/screenshot.jpg?raw=true)
 ---
 # Node-Virtual-Gamepads ReadMe:
 
@@ -28,9 +28,9 @@ You can virtually plug in multiple gamepad controllers.
 
 Demo
 ----
-Demo video 1 player in game [here](https://www.youtube.com/watch?v=OWgWugNsF7w)
+Original Demo video 1 player in game [here](https://www.youtube.com/watch?v=OWgWugNsF7w)
 
-Demo video 3 players on EmulStation [here](https://www.youtube.com/watch?v=HQROnYLRyOw)
+Original Demo video 3 players on EmulStation [here](https://www.youtube.com/watch?v=HQROnYLRyOw)
 
 Prerequisite
 ------------
