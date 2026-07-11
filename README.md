@@ -111,65 +111,70 @@ If you want do add a new keyboard layout please refer to [this file](CREATE_KEYB
 
 
 # TODO 
+
 1) Server-side profile management:
    
-    [ ] Add a settings page to load/save/edit profiles
+    - [ ] Add a settings page to load/save/edit profiles
     
-    [ ] Save profiles to file
+    - [ ] Save profiles to file
     
-    [ ] Auto-load last profile
+    - [ ] Auto-load last profile
     
 2) Better gyro implementation:
-    [ ] Pitch/yaw smoothing
 
-    [ ] Optional reset button
+    - [ ] Pitch/yaw smoothing
+
+    - [ ] Optional reset button
     
-    [ ] Centering on button press
+    - [ ] Centering on button press
 
     
 3) Profile switching:
-    [ ] Quick profile toggle (LB/RB?)
-    [ ] Visual indicator for active profile
+
+    - [ ] Quick profile toggle (LB/RB?)
+
+    - [ ] Visual indicator for active profile
 
 
 4) UI/UX improvements:
     
-    [ ] Touch lock toggle (disable gyro on touch)
+    - [ ] Touch lock toggle (disable gyro on touch)
 
-    [ ] Button remapping
+    - [ ] Button remapping
 
-    [ ] Custom button layouts per profile
+    - [ ] Custom button layouts per profile
 
 
 5) Hardware compatibility:
 
-    [ ] Test on real Android device
+    - [ ] Test on real Android device
 
-    [ ] Test gyro on iOS (if possible)
+    - [ ] Test gyro on iOS (if possible)
 
-    [ ] Test L2/R2 triggers on real device
+    - [ ] Test L2/R2 triggers on real device
 
 
 6) Performance:
 
-    [ ] Optimize gyro processing
+    - [ ] Optimize gyro processing
 
-    [ ] Reduce latency
+    - [ ] Reduce latency
 
-    [ ] Test battery impact
+    - [ ] Test battery impact
 
 
 7) Advanced features:
-    [ ] Gyro-to-mouse mode
     
-    [ ] Touchpad mode improvements
+    - [ ] Gyro-to-mouse mode
     
-    [ ] Keyboard layouts per profile
+    - [ ] Touchpad mode improvements
+    
+    - [ ] Keyboard layouts per profile
     
 
 8) Documentation:
    
-    [ ] Some documentation As needed
+    - [ ] Some documentation As needed
 
 
 
