@@ -63,6 +63,10 @@ if [ ! -f "$SCRIPT_DIR/ssl/key.pem" ] || [ ! -f "$SCRIPT_DIR/ssl/cert.pem" ]; th
 	echo "SSL generated successfully."
 fi
 
+# Ensure presets directory exists and has correct permissions
+mkdir -p "$SCRIPT_DIR/presets/wheel"
+chmod -R 777 "$SCRIPT_DIR/presets"
+
 # Show server qr-code
 if command -v qrencode &>/dev/null; then
 	qrencode -t ansiutf8 "https://$IP_ADDRESS:80"

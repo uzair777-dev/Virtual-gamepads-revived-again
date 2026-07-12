@@ -1,0 +1,310 @@
+/* ============================================
+   Racing Wheel Gamepad — standalone CSS
+   ============================================ */
+
+#wheel-controller {
+  --wheel-size: clamp(150px, 45cqmin, 300px);
+  --paddle-width: clamp(20px, 6cqw, 40px);
+  --paddle-height: clamp(60px, 15cqmin, 120px);
+  --slider-width: clamp(30px, 8cqw, 60px);
+  --btn-size: clamp(40px, 8cqmin, 60px);
+
+  position: absolute;
+  top: 0; bottom: 0; left: 0; right: 0;
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  max-width: calc(100vh * 2.2);
+  max-height: calc(100vw * 0.65);
+  container-type: size;
+  display: flex;
+  flex-direction: column;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #e6e6e6;
+}
+
+body.wheel-dark { background: #282828; color: #eee; }
+body.wheel-amoled { background: #000; color: #fff; }
+
+/* Top Bar */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 15px;
+  flex: 0 0 auto;
+}
+
+.wheel-player-connecting { color: #b08a00; animation: pulse 1.2s infinite; }
+.wheel-player-connected { color: #2e7d32; }
+.wheel-status-disconnected { color: #999; }
+.wheel-status-connected { color: #4caf50; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.top-bar-controls {
+  display: flex;
+  gap: 10px;
+}
+
+#preset-select, #btn-edit-mode {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  cursor: pointer;
+}
+body.wheel-dark #preset-select, body.wheel-dark #btn-edit-mode { background: #333; color: #fff; border-color: #555; }
+
+/* Main Area */
+.wheel-main {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  min-height: 0;
+}
+
+.wheel-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Sliders */
+.wheel-col-sliders {
+  flex: 0 0 auto;
+  flex-direction: row;
+  gap: 15px;
+}
+
+.slider-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  padding-bottom: 10px;
+}
+
+.slider-label {
+  font-weight: bold;
+  font-size: 0.8rem;
+  margin-bottom: 5px;
+}
+
+.slider-track {
+  width: var(--slider-width);
+  flex: 1;
+  background: rgba(0,0,0,0.1);
+  border-radius: 10px;
+  position: relative;
+  border: 2px solid #bbb;
+  overflow: hidden;
+}
+
+.slider-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0%;
+  transition: height 0.05s linear;
+}
+
+/* Wheel & Paddles */
+.wheel-col-center {
+  flex: 1 1 auto;
+  position: relative;
+  gap: 10px;
+}
+
+.steering-wheel-wrapper {
+  position: relative;
+  width: var(--wheel-size);
+  height: var(--wheel-size);
+  flex-shrink: 0;
+}
+
+.steering-wheel {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, #444 30%, #222 70%);
+  border: 15px solid #111;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 0 2px 5px rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+/* Visual marker to see rotation */
+.steering-wheel::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  width: 10px;
+  height: 25px;
+  background: red;
+  border-radius: 3px;
+}
+
+.wheel-center-zone {
+  width: 50%;
+  height: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.paddle-zone {
+  width: var(--paddle-width);
+  height: var(--paddle-height);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Side Panels */
+.wheel-col-panels {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  gap: 20px;
+}
+.panel-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Buttons */
+.wheel-btn {
+  width: var(--btn-size);
+  height: var(--btn-size);
+  border-radius: 50%;
+  background: #eaeaea;
+  border: 1px solid #ccc;
+  font-weight: bold;
+  font-size: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+}
+body.wheel-dark .wheel-btn { background: #333; color: #fff; border-color: #555; }
+
+.wheel-btn.pressed {
+  transform: scale(0.9);
+  filter: brightness(0.8);
+}
+
+/* Paddles specifically */
+.paddle-btn {
+  width: 100%;
+  height: 50px;
+  border-radius: 5px;
+  background: #aaa;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Util Bar */
+.wheel-util-bar {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 5px;
+}
+
+.wheel-util-btn {
+  background: rgba(0,0,0,0.1);
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 8px;
+  padding: 5px 15px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+body.wheel-dark .wheel-util-btn { color: #fff; background: rgba(255,255,255,0.1); }
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  min-width: 300px;
+}
+body.wheel-dark .modal-content { background: #222; color: #fff; }
+
+.editor-content {
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.editor-buttons-list {
+  margin: 15px 0;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.edit-btn-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 5px;
+  align-items: center;
+}
+
+.edit-btn-row input, .edit-btn-row select {
+  padding: 5px;
+  flex: 1;
+}
+
+.editor-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+.editor-actions input { flex: 1; padding: 5px; }
+
+#btn-fullscreen-yes, #btn-fullscreen-no, #btn-add-button, #btn-save-preset, #btn-close-editor {
+  padding: 8px 15px;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}

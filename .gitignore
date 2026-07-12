@@ -1,1 +1,4 @@
 node_modules
+presets/
+!presets/wheel/
+!presets/wheel/default.json

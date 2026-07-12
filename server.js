@@ -48,6 +48,9 @@ Virtual gamepad application
   var xboxone_gamepad_hub = require('./app/virtual_xboxone_hub');
   var xboxone_hub = new xboxone_gamepad_hub();
 
+  var virtual_wheel_hub = require('./app/virtual_wheel_hub');
+  var wh_hub = new virtual_wheel_hub();
+
   // Set port from environment variables or settings file
   port = process.env.PORT || config.port;
 
@@ -68,7 +71,47 @@ Virtual gamepad application
   });
 
   // Serve static files
+  app.use(express.json());
   app.use(express["static"](__dirname + '/public'));
+
+  // REST API for Wheel Presets
+  var presetsDir = path.join(__dirname, 'presets', 'wheel');
+  
+  app.get('/api/wheel-presets', function(req, res) {
+    fs.readdir(presetsDir, function(err, files) {
+      if (err) return res.json([]);
+      var presets = files.filter(f => f.endsWith('.json')).map(f => f.replace('.json', ''));
+      res.json(presets);
+    });
+  });
+
+  app.get('/api/wheel-presets/:name', function(req, res) {
+    var p = path.join(presetsDir, req.params.name + '.json');
+    fs.readFile(p, 'utf8', function(err, data) {
+      if (err) return res.status(404).json({error: 'Not found'});
+      try { res.json(JSON.parse(data)); }
+      catch(e) { res.status(500).json({error: 'Invalid JSON'}); }
+    });
+  });
+
+  app.post('/api/wheel-presets', function(req, res) {
+    var name = req.body.name;
+    var configData = req.body.config;
+    if (!name || !configData) return res.status(400).json({error: 'Missing name or config'});
+    var p = path.join(presetsDir, name + '.json');
+    fs.writeFile(p, JSON.stringify(configData, null, 2), function(err) {
+      if (err) return res.status(500).json({error: 'Failed to save'});
+      res.json({success: true});
+    });
+  });
+
+  app.delete('/api/wheel-presets/:name', function(req, res) {
+    var p = path.join(presetsDir, req.params.name + '.json');
+    fs.unlink(p, function(err) {
+      if (err) return res.status(500).json({error: 'Failed to delete'});
+      res.json({success: true});
+    });
+  });
 
   // Socket.IO connection management
   io.on('connection', function(socket) {
@@ -76,6 +119,7 @@ Virtual gamepad application
     socket.gamePadIds = [];
     socket.xinputGamePadIds = [];
     socket.xboxOneGamePadIds = [];
+    socket.wheelIds = [];
     socket.keyBoardIds = [];
     socket.touchpadIds = [];
 
@@ -99,6 +143,13 @@ Virtual gamepad application
         });
       });
 
+      // Disconnect all wheels owned by this socket
+      socket.wheelIds.forEach(function(padId) {
+        wh_hub.disconnectWheel(padId, function() {
+          log('info', 'Virtual wheel ' + padId + ' disconnected.');
+        });
+      });
+
       // Disconnect all keyboards owned by this socket
       socket.keyBoardIds.forEach(function(boardId) {
         log('info', ' Keyboard ' + boardId + ' disconnected');
@@ -114,6 +165,7 @@ Virtual gamepad application
       if (socket.gamePadIds.length === 0 &&
           socket.xinputGamePadIds.length === 0 &&
           socket.xboxOneGamePadIds.length === 0 &&
+          socket.wheelIds.length === 0 &&
           socket.keyBoardIds.length === 0 &&
           socket.touchpadIds.length === 0) {
         log('info', ' Unknown disconnect');
@@ -202,6 +254,30 @@ Virtual gamepad application
       }
     });
 
+    // Manage Wheel connection
+    socket.on('connectWheel', function() {
+      return wh_hub.connectWheel(function(gamePadId) {
+        var ledBitField = config.ledBitFieldSequence[gamePadId];
+        if (gamePadId !== -1) {
+          log('info', ' connectWheel: success (slot ' + gamePadId + ')');
+          socket.wheelIds.push(gamePadId);
+          return socket.emit('wheelConnected', {
+            padId: gamePadId,
+            ledBitField: ledBitField
+          });
+        } else {
+          return log('warning', ' connectWheel: failed');
+        }
+      });
+    });
+
+    socket.on('wheelEvent', function(data) {
+      log('debug', 'wheelEvent ' + JSON.stringify(data));
+      if (data && data.padId !== undefined && socket.wheelIds.indexOf(data.padId) !== -1) {
+        wh_hub.sendEvent(data.padId, data);
+      }
+    });
+
     // Manage Keyboard connection
     socket.on('connectKeyboard', function() {
       return kb_hub.connectKeyboard(function(keyBoardId) {
@@ -258,6 +334,7 @@ Virtual gamepad application
         gamepads: gp_hub.getStatus(),
         xinputGamepads: xgp_hub.getStatus(),
         xboxOneGamepads: xboxone_hub.getStatus(),
+        wheels: wh_hub.getStatus(),
         keyboards: kb_hub.getStatus(),
         touchpads: tp_hub.getStatus()
       });
@@ -297,6 +374,16 @@ Virtual gamepad application
             xboxone_hub.disconnectGamepad(padId, function() {
               log('info', 'Xboxone gamepad ' + padId + ' manually disconnected');
               socket.emit('controllerDisconnected', { type: 'xboxOneGamepad', padId: padId });
+            });
+          }
+          break;
+        case 'wheel':
+          idx = socket.wheelIds.indexOf(padId);
+          if (idx !== -1) {
+            socket.wheelIds.splice(idx, 1);
+            wh_hub.disconnectWheel(padId, function() {
+              log('info', 'Virtual wheel ' + padId + ' manually disconnected');
+              socket.emit('controllerDisconnected', { type: 'wheel', padId: padId });
             });
           }
           break;

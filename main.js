@@ -20,6 +20,7 @@ Virtual gamepad application
   if (process.env.HOT_RELOAD) {
     options.watch = true;
     options.watchDirectory = __dirname;
+    options.watchIgnorePatterns = ["presets/**", "node_modules/**", ".git/**"];
     log("info", "Hot reload is ENABLED (watching for file changes)");
   }
 
