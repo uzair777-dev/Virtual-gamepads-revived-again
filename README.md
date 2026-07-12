@@ -15,9 +15,9 @@ View [TODO](#todo) for Upcoming stuffs
 
 ## Install and run:
 ```bash
-    git clone https://github.com/uzair777-dev/Virtual-gamepads-revived-again
-    cd Virtual-gamepads-revived-again
-    ./run.sh
+    git clone https://github.com/uzair777-dev/Virtual-gamepads-plus
+    cd Virtual-gamepads-plus
+    ./run.sh    
 ```
 
 
