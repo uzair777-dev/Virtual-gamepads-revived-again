@@ -361,9 +361,9 @@
     // Update clutch
     var hasClutch = document.getElementById('edit-clutch-toggle').checked;
     if(!currentPreset.sliders) currentPreset.sliders = [
-      { id: "throttle", label: "Throttle", axis: "0x05", visible: true },
+      { id: "throttle", label: "Throttle", axis: "0x01", visible: true },
       { id: "brake", label: "Brake", axis: "0x02", visible: true },
-      { id: "clutch", label: "Clutch", axis: "0x01", visible: false }
+      { id: "clutch", label: "Clutch", axis: "0x05", visible: false }
     ];
     var c = currentPreset.sliders.find(s=>s.id==='clutch');
     if(c) c.visible = hasClutch;
@@ -387,6 +387,19 @@
     document.getElementById('wheel-connection-status').className = 'wheel-connection-status wheel-status-connected';
     document.getElementById('wheel-player-banner').textContent = 'Player ' + (padId + 1);
     document.getElementById('wheel-player-banner').className = 'wheel-player-banner wheel-player-connected';
+    
+    // Initialize pedals to 0 after 100ms delay so they don't default to 50%
+    setTimeout(function() {
+      if (currentPreset && currentPreset.sliders) {
+        currentPreset.sliders.forEach(function(s) {
+          emit(EV_ABS, parseInt(s.axis, 16), 0);
+        });
+      } else {
+        emit(EV_ABS, 0x01, 0);
+        emit(EV_ABS, 0x02, 0);
+        emit(EV_ABS, 0x05, 0);
+      }
+    }, 100);
   });
 
   socket.on('connect', function() {
