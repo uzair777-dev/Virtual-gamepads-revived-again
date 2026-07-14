@@ -7,8 +7,9 @@ This repo is a fork of [alr86/node-virtual-gamepads-revived](https://github.com/
 - Dark Mode
 - An Script to test gamepads [Test pending]
 - Better styles
-- Also have "L2", "R2" & "Menu" buttons
+- ~~Also have "L2", "R2" & "Menu" buttons~~ [Don't know what they did on the other controller]
 - XBOX-Style buttons layout with xinput support
+- Steering wheel support with genuine steering wheel input
 - ~~PreDefiend `.desktop` files to run script(needs change)~~ 
 
 View [TODO](#todo) for Upcoming stuffs 
@@ -25,7 +26,7 @@ View [TODO](#todo) for Upcoming stuffs
 > The below documentation is old but will be replaced only after I implement all the [stuff](#todo) first.
 
 
-## ScreenShot:
+## Old ScreenShot:
 (Red L2-R2 Buttons over D-pad only works when gyro enabled)
 
 ![Standalone installation step 1](https://github.com/uzair777-dev/Virtual-gamepads-plus/blob/main/public/images/screenshot.jpg?raw=true)
