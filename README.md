@@ -2,10 +2,10 @@
 
 This repo is a fork of [alr86/node-virtual-gamepads-revived](https://github.com/alr86/node-virtual-gamepads-revived) (which is a fork of [node-virtual-gamepads](https://github.com/jehervy/node-virtual-gamepads)) with ~~some~~ Many changes(just tested in linux, and will only ):
 
-- ~~Show server QR-Code~~ [Unsupported currently, Doesn't work]
+- Shows QR-Code to join 
 - ~~Gyro support~~ [Partial, will be impelmented]
 - Dark Mode
-- An Script to test gamepads [Test pending]
+- An Script to test gamepads [still pending]
 - Better styles
 - ~~Also have "L2", "R2" & "Menu" buttons~~ [Don't know what they did on the other controller]
 - XBOX-Style buttons layout with xinput support
@@ -18,7 +18,13 @@ View [TODO](#todo) for Upcoming stuffs
 ```bash
     git clone https://github.com/uzair777-dev/Virtual-gamepads-plus
     cd Virtual-gamepads-plus
-    ./run.sh    
+    # Make script executable by this command or gui
+    chmod +x launch_gui.sh
+    chmod +x run.sh
+    # Running gui 
+    ./launch_gui.sh
+    # Or launch in terminal
+    ./run.sh     
 ```
 
 
@@ -31,12 +37,12 @@ View [TODO](#todo) for Upcoming stuffs
 
 ![Standalone installation step 1](https://github.com/uzair777-dev/Virtual-gamepads-plus/blob/main/public/images/screenshot.jpg?raw=true)
 ---
-# Node-Virtual-Gamepads ReadMe:
+## Node-Virtual-Gamepads ReadMe:
 
-This nodejs application turns your smartphone into a gamepad controller on Linux OS simply by reaching a local address.
+This nodejs application turns your smartphone into a gamepad controller only GNU/Linux OS simply by reaching a local address.
 You can virtually plug in multiple gamepad controllers.
 
-Demo
+### Original Demo
 ----
 Original Demo video 1 player in game [here](https://www.youtube.com/watch?v=OWgWugNsF7w)
 
@@ -59,13 +65,14 @@ Usage
 -----
 ```bash 
    
-   ./run.sh # execute inside the directory
+   ./launch_gui.sh # Execute the server GUI (RECOMMENDED)
+   ./run.sh # execute the command only inside the directory
 
 ```
 
-Features
+## Features
 --------
-### Plug up to 4 virtual gamepads
+### Plug up to ~~4 virtual gamepads~~ (New limits unknown, but Lets asume 4 for now)
 The application will plug automatically a new controller when the web application is launched and unplug it at disconnection.
 4 slots are available so 4 virtual gamepads can be created. You can see your current slot on the indicator directly on the vitual gamepad.
 
@@ -78,6 +85,7 @@ to let as much space as possible for the joystick and avoid touch mistakes.
 
 > [!WARNING]
 > The support in mordern controllers is a bit wonky, and needs to be worked on.
+> To be precise, precise haptics (no pun intended) are not supported on browser, but itsstill very good, ngl
 
 To know if we pressed a button with success, the web application provides an haptic feedback
 which can be easily deactivated by turning off the vibrations of the phone.
@@ -91,7 +99,7 @@ which can be easily deactivated by turning off the vibrations of the phone.
 ### An index page lets you choose
 ![Index page](https://github.com/miroof/node-virtual-gamepads/blob/resources/screenshots/index.png?raw=true)
 
-Developing
+## Developing
 ----------
 Please read the [contribution guideline](CONTRIBUTING.md) first if you haven't already.
 
