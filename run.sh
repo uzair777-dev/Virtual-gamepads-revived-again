@@ -110,6 +110,11 @@ else
     echo "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 fi
 
+# Ensure port is completely free before starting
+if command -v fuser &>/dev/null; then
+    sudo fuser -k -s ${PORT}/tcp &>/dev/null || true
+fi
+
 cleanup() {
 	trap - EXIT INT TERM HUP
     if [ -z "$GUI_MODE" ]; then
@@ -120,6 +125,11 @@ cleanup() {
 	elif command -v ufw &>/dev/null; then
 		sudo ufw delete allow $PORT/tcp > /dev/null
 	fi
+    
+    # Ensure all server processes are killed
+    if command -v fuser &>/dev/null; then
+        sudo fuser -k -s ${PORT}/tcp &>/dev/null || true
+    fi
 }
 
 trap cleanup EXIT INT TERM HUP

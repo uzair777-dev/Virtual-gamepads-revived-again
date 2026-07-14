@@ -44,6 +44,8 @@ if [ -n "$MISSING_DEPS" ]; then
     fi
 fi
 
+# GUI will run as standard user so it has access to the D-Bus session for the system tray
+
 # Make scripts executable
 chmod +x "$SCRIPT_DIR/gui.py" "$SCRIPT_DIR/run.sh" "$SCRIPT_DIR/testGamepads.sh"
 

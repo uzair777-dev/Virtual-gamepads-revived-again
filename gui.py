@@ -143,15 +143,14 @@ class VirtualGamepadsGUI(Gtk.Window):
         self.start_btn.set_sensitive(False)
         
         run_script = os.path.join(SCRIPT_DIR, 'run.sh')
+        
         cmd = ['pkexec', 'bash', run_script, '--gui']
         
         try:
             self.server_process = subprocess.Popen(
                 cmd,
                 stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                cwd=SCRIPT_DIR,
-                preexec_fn=os.setsid  # To kill process group later
+                stderr=subprocess.STDOUT
             )
             
             # Make stdout non-blocking
@@ -203,7 +202,10 @@ class VirtualGamepadsGUI(Gtk.Window):
         
         if HAS_SEGNO:
             try:
-                tmp_qr_path = "/tmp/vgp_qrcode.png"
+                # Store QR code in the script directory to avoid /tmp permission conflicts
+                SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+                tmp_qr_path = os.path.join(SCRIPT_DIR, ".vgp_qrcode_user.png")
+                
                 qr = segno.make(url)
                 qr.save(tmp_qr_path, scale=6, border=2)
                 
@@ -222,8 +224,9 @@ class VirtualGamepadsGUI(Gtk.Window):
     def stop_server(self):
         if self.server_process:
             try:
+                # Get the process group ID of the pkexec process
                 pgid = os.getpgid(self.server_process.pid)
-                # Server runs as root (via pkexec), so we need pkexec to kill it
+                # Use pkexec to kill the entire process group (run.sh, forever-monitor, node)
                 subprocess.run(
                     ['pkexec', 'kill', '-TERM', '--', '-' + str(pgid)],
                     timeout=10
@@ -278,13 +281,14 @@ class VirtualGamepadsGUI(Gtk.Window):
                 icon_name,
                 AppIndicator.IndicatorCategory.APPLICATION_STATUS
             )
-            self.indicator.set_status(AppIndicator.IndicatorStatus.PASSIVE)
+            # Make the tray icon always visible (ACTIVE) if the Desktop Environment supports it
+            self.indicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
             self.indicator.set_menu(menu)
         elif hasattr(Gtk, 'StatusIcon'):
             self.status_icon = Gtk.StatusIcon.new_from_icon_name(icon_name)
             self.status_icon.connect("popup-menu", self.on_tray_popup, menu)
             self.status_icon.connect("activate", self.on_tray_show)
-            self.status_icon.set_visible(False)
+            self.status_icon.set_visible(True)
 
     def on_tray_popup(self, icon, button, time, menu):
         menu.popup(None, None, None, None, button, time)
