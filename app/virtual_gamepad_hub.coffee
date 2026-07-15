@@ -7,7 +7,7 @@ gamepad = require './virtual_gamepad'
 log = require '../lib/log'
 config = require '../config'
 
-num_gamepads = config.ledBitFieldSequence.length
+num_gamepads = config.maxGamepads || config.ledBitFieldSequence.length
 # ledBitFieldSequence should be an array of 'bit fields'.
 # the bit fields are numbers from 0-15, resulting in the following LED arrangements:
 #  0 - ....
@@ -69,5 +69,20 @@ class virtual_gamepad_hub
   sendEvent: (padId, event) ->
     if @gamepads[padId]
       @gamepads[padId].sendEvent event
+
+  getStatus: ->
+    slots = []
+    used = 0
+    for i in [0..(num_gamepads-1)]
+      occupied = !!@gamepads[i]
+      slots.push occupied
+      if occupied
+        used++
+    return {
+      slots: slots
+      total: num_gamepads
+      used: used
+      free: num_gamepads - used
+    }
 
 module.exports = virtual_gamepad_hub

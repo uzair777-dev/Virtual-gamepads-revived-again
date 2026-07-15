@@ -4,6 +4,9 @@ Virtual touchpad hub class
 
 touchpad = require './virtual_touchpad'
 log = require '../lib/log'
+config = require '../config'
+
+num_touchpads = config.maxTouchpads || 4
 
 class virtual_touchpad_hub
 
@@ -12,6 +15,12 @@ class virtual_touchpad_hub
 
   connectTouchpad: (callback) ->
     touchpadId = @touchpads.length
+
+    # Check if max touchpads reached
+    if touchpadId >= num_touchpads
+      log 'warning', "Couldn't add new touchpad: no slot left."
+      callback -1
+      return
 
     # Create and connect the touchpad
     log 'info', 'Creating and connecting to touchpad number ' + touchpadId

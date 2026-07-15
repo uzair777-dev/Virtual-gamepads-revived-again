@@ -7,7 +7,7 @@ xinput_gamepad = require './virtual_xinput_gamepad'
 log = require '../lib/log'
 config = require '../config'
 
-num_gamepads = config.ledBitFieldSequence.length
+num_gamepads = config.maxXinputGamepads || config.ledBitFieldSequence.length
 
 class virtual_xinput_gamepad_hub
 

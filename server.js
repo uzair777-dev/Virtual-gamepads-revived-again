@@ -19,11 +19,35 @@ Virtual gamepad application
   log = require('./lib/log');
 
   // SSL settings for HTTPS server
+  var sslDir = path.join(__dirname, 'ssl');
+  var keyPath = path.join(sslDir, 'key.pem');
+  var certPath = path.join(sslDir, 'cert.pem');
+
+  function ensureCerts() {
+    if (!fs.existsSync(sslDir)) {
+      fs.mkdirSync(sslDir, { recursive: true });
+    }
+    if (!fs.existsSync(keyPath) || !fs.existsSync(certPath)) {
+      log('info', 'Generating self-signed SSL certificate...');
+      var child_process = require('child_process');
+      try {
+        child_process.execSync(
+          'openssl req -x509 -newkey rsa:4096 -keyout "' + keyPath + '" -out "' + certPath + '" -days 3650 -nodes -subj "/C=US/ST=State/L=Locality/O=Organization/CN=localhost"',
+          { stdio: 'ignore' }
+        );
+        log('info', 'SSL certificate generated at ' + sslDir);
+      } catch (err) {
+        log('error', 'Failed to generate SSL certificate: ' + err.message);
+        throw err;
+      }
+    }
+  }
+
+  ensureCerts();
+
   var options = {
-    key: fs.readFileSync(path.join(__dirname, 'ssl', 'key.pem')),
-    cert: fs.readFileSync(path.join(__dirname, 'ssl', 'cert.pem')),
-    // If you have a CA certificate, enable the following line
-    // ca: fs.readFileSync(path.join(__dirname, 'ssl', 'ca_bundle.crt'))
+    key: fs.readFileSync(keyPath),
+    cert: fs.readFileSync(certPath),
   };
 
   // Create HTTPS server

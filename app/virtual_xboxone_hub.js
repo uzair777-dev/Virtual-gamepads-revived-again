@@ -2,7 +2,7 @@ var config = require('../config');
 var xboxone_gamepad = require('./virtual_xboxone_gamepad');
 var log = require('../lib/log');
 
-var num_gamepads = config.ledBitFieldSequence.length;
+var num_gamepads = config.maxXboxOneGamepads || config.ledBitFieldSequence.length;
 
 var virtual_xboxone_hub = (function() {
   function virtual_xboxone_hub() {

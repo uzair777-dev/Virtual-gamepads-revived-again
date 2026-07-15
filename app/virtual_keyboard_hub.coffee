@@ -5,6 +5,9 @@ Virtual keyboard hub class
 
 keyboard = require './virtual_keyboard'
 log = require '../lib/log'
+config = require '../config'
+
+num_keyboards = config.maxKeyboards || 4
 
 class virtual_keyboard_hub
 
@@ -13,6 +16,12 @@ class virtual_keyboard_hub
 
   connectKeyboard: (callback) ->
     boardId = @keyboards.length
+
+    # Check if max keyboards reached
+    if boardId >= num_keyboards
+      log 'warning', "Couldn't add new keyboard: no slot left."
+      callback -1
+      return
 
     # Create and connect the keyboard
     log 'info', 'Creating and connecting to keyboard number' + boardId

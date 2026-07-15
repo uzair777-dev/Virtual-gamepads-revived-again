@@ -2,7 +2,7 @@ var config = require('../config');
 var virtual_wheel = require('./virtual_wheel');
 var log = require('../lib/log');
 
-var num_gamepads = config.ledBitFieldSequence.length;
+var num_gamepads = config.maxWheels || config.ledBitFieldSequence.length;
 
 var virtual_wheel_hub = (function() {
   function virtual_wheel_hub() {

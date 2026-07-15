@@ -82,17 +82,6 @@ if [ -z "$IP_ADDRESS" ]; then
 fi
 
 mkdir -p "$SCRIPT_DIR/ssl"
-# Generate SSL certificate if is not exist for https connection
-if [ ! -f "$SCRIPT_DIR/ssl/key.pem" ] || [ ! -f "$SCRIPT_DIR/ssl/cert.pem" ]; then
-    if [ -z "$GUI_MODE" ]; then
-	    echo "Generating SSL certificates..."
-    fi
-	openssl req -x509 -newkey rsa:4096 -keyout "$SCRIPT_DIR/ssl/key.pem" -out "$SCRIPT_DIR/ssl/cert.pem" -days 123456 -nodes \
-		-subj "/C=US/ST=State/L=Locality/O=Organization/CN=localhost" 2>/dev/null
-    if [ -z "$GUI_MODE" ]; then
-	    echo "SSL generated successfully."
-    fi
-fi
 
 # Ensure presets directory exists and has correct permissions
 mkdir -p "$SCRIPT_DIR/presets/wheel"
