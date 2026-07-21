@@ -37,7 +37,9 @@ var virtual_wheel = (function() {
           ioctl(_this.fd, uinput.UI_SET_ABSBIT, uinput.ABS_X);       // Steering
           ioctl(_this.fd, uinput.UI_SET_ABSBIT, uinput.ABS_Y);       // Throttle
           ioctl(_this.fd, uinput.UI_SET_ABSBIT, uinput.ABS_Z);       // Brake
-          ioctl(_this.fd, uinput.UI_SET_ABSBIT, uinput.ABS_RZ);      // Clutch (Optional)
+          ioctl(_this.fd, uinput.UI_SET_ABSBIT, uinput.ABS_RX);      // Clutch (axis 3)
+          ioctl(_this.fd, uinput.UI_SET_ABSBIT, uinput.ABS_RY);      // Camera X (axis 4)
+          ioctl(_this.fd, uinput.UI_SET_ABSBIT, uinput.ABS_RZ);      // Camera Y (axis 5)
 
           uidev = new uinputStructs.uinput_user_dev;
           uidev_buffer = uidev.ref();
@@ -66,10 +68,22 @@ var virtual_wheel = (function() {
           uidev.absfuzz[uinput.ABS_Z] = 0;
           uidev.absflat[uinput.ABS_Z] = 0;
 
-          // Setup clutch (0 to 255)
-          uidev.absmax[uinput.ABS_RZ] = 255;
-          uidev.absmin[uinput.ABS_RZ] = 0;
-          uidev.absfuzz[uinput.ABS_RZ] = 0;
+          // Setup clutch (0 to 255) on ABS_RX (axis 3)
+          uidev.absmax[uinput.ABS_RX] = 255;
+          uidev.absmin[uinput.ABS_RX] = 0;
+          uidev.absfuzz[uinput.ABS_RX] = 0;
+          uidev.absflat[uinput.ABS_RX] = 0;
+
+          // Setup camera X (right stick X) on ABS_RY (axis 4) -32767..32767
+          uidev.absmax[uinput.ABS_RY] = 32767;
+          uidev.absmin[uinput.ABS_RY] = -32767;
+          uidev.absfuzz[uinput.ABS_RY] = 16;
+          uidev.absflat[uinput.ABS_RY] = 0;
+
+          // Setup camera Y (right stick Y) on ABS_RZ (axis 5) -32767..32767
+          uidev.absmax[uinput.ABS_RZ] = 32767;
+          uidev.absmin[uinput.ABS_RZ] = -32767;
+          uidev.absfuzz[uinput.ABS_RZ] = 16;
           uidev.absflat[uinput.ABS_RZ] = 0;
 
           return fs.write(_this.fd, uidev_buffer, 0, uidev_buffer.length, null, function(err) {
@@ -88,7 +102,9 @@ var virtual_wheel = (function() {
                     try {
                       _this.sendEvent({ type: uinput.EV_ABS, code: uinput.ABS_Y, value: 0 });
                       _this.sendEvent({ type: uinput.EV_ABS, code: uinput.ABS_Z, value: 0 });
-                      _this.sendEvent({ type: uinput.EV_ABS, code: uinput.ABS_RZ, value: 0 });
+                      _this.sendEvent({ type: uinput.EV_ABS, code: uinput.ABS_RX, value: 0 }); // clutch
+                      _this.sendEvent({ type: uinput.EV_ABS, code: uinput.ABS_RY, value: 0 }); // camera X
+                      _this.sendEvent({ type: uinput.EV_ABS, code: uinput.ABS_RZ, value: 0 }); // camera Y
                     } catch (e) {
                       log('error', "Error initializing pedals: " + e);
                     }
@@ -121,8 +137,8 @@ var virtual_wheel = (function() {
       ioctl(this.fd, uinput.UI_DEV_DESTROY);
       fs.closeSync(this.fd);
       this.fd = void 0;
-      return callback();
     }
+    return callback();
   };
 
   virtual_wheel.prototype.sendEvent = function(event, error) {

@@ -295,10 +295,11 @@ Virtual gamepad application
       });
     });
 
+    // Manage Wheel events
     socket.on('wheelEvent', function(data) {
       log('debug', 'wheelEvent ' + JSON.stringify(data));
       if (data && data.padId !== undefined && socket.wheelIds.indexOf(data.padId) !== -1) {
-        wh_hub.sendEvent(data.padId, data);
+        wh_hub.sendEvent(data.padId, data);  // Passthrough ALL events
       }
     });
 

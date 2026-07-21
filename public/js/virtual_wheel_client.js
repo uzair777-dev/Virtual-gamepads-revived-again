@@ -5,14 +5,32 @@
   var connected = false;
   var padId = null;
 
+  // Input event types
   var EV_KEY = 0x01;
   var EV_ABS = 0x03;
-  var ABS_X = 0x00; // Steering
-  var ABS_Z = 0x02; // Throttle
-  var ABS_RZ = 0x05; // Brake
-  var ABS_Y = 0x01; // Clutch
+
+  // Wheel axes (ABS)
+  var ABS_X = 0x00;   // Steering
+  var ABS_Y = 0x01;   // Throttle
+  var ABS_Z = 0x02;   // Brake
+  var ABS_RX = 0x03;  // Clutch
+  var ABS_RY = 0x04;  // Camera X (right stick)
+  var ABS_RZ = 0x05;  // Camera Y (right stick)
+
+  // Wheel button codes
+  var BTN_TRIGGER = 0x120;
+  var BTN_THUMB = 0x121;
+  var BTN_TOP = 0x123;
+  var BTN_TOP2 = 0x124;
+  var BTN_BASE = 0x126;
+  var BTN_BASE2 = 0x127;
+  var BTN_BASE3 = 0x128;
+  var BTN_BASE4 = 0x129;
+  var BTN_BASE5 = 0x12a;
+  var BTN_BASE6 = 0x12b;
 
   var currentPreset = null;
+  var cameraKnob = null;
 
   function emit(type, code, value) {
     if (!connected || padId === null) return;
@@ -36,14 +54,8 @@
     document.body.classList.toggle('wheel-dark');
   };
 
-  // Prevent context menu and gestures
+  // Prevent context menu
   window.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-  document.body.addEventListener('touchmove', function(e) {
-    // Only prevent default if we are touching a control
-    if (e.target.closest('.slider-container') || e.target.closest('.steering-wheel')) {
-      e.preventDefault();
-    }
-  }, { passive: false });
 
   // --- Fullscreen Popup ---
   var fsPopup = document.getElementById('fullscreen-popup');
@@ -54,7 +66,6 @@
   document.getElementById('btn-fullscreen-no').addEventListener('click', function() {
     fsPopup.style.display = 'none';
   });
-  // Show popup on load if not fullscreen
   setTimeout(function() {
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
       fsPopup.style.display = 'flex';
@@ -73,7 +84,6 @@
 
     function update(clientY) {
       var rect = track.getBoundingClientRect();
-      // Y is inverted (bottom is 0, top is max)
       var val = 1 - ((clientY - rect.top) / rect.height);
       val = Math.max(0, Math.min(1, val));
       fill.style.height = (val * 100) + '%';
@@ -125,18 +135,15 @@
   // --- Steering Wheel (Rotary Dial) ---
   var wheelKnob = document.getElementById('steering-wheel-knob');
   var wheelTrackingId = null;
-  var currentAngle = 0; // Total accumulated angle in degrees
-  var lastTouchAngle = 0; // Angle of touch from previous frame
+  var currentAngle = 0;
+  var lastTouchAngle = 0;
   
   function getTouchAngle(clientX, clientY) {
     var rect = wheelKnob.getBoundingClientRect();
     var centerX = rect.left + rect.width / 2;
     var centerY = rect.top + rect.height / 2;
-    // atan2 returns -PI to PI
     var rad = Math.atan2(clientY - centerY, clientX - centerX);
-    // Convert to degrees, add 90 so 0 is top
     var deg = (rad * 180 / Math.PI) + 90;
-    // Normalize to -180 to 180
     if (deg > 180) deg -= 360;
     return deg;
   }
@@ -156,7 +163,6 @@
         e.preventDefault();
         var newAngle = getTouchAngle(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
         
-        // Calculate delta and handle the -180/180 boundary wrap
         var delta = newAngle - lastTouchAngle;
         if (delta > 180) delta -= 360;
         else if (delta < -180) delta += 360;
@@ -164,13 +170,11 @@
         currentAngle += delta;
         lastTouchAngle = newAngle;
 
-        // Clamp total rotation based on preset (default 180 total range, so 90 each way)
         var maxAngle = (currentPreset && currentPreset.steeringRange) ? currentPreset.steeringRange / 2 : 90;
         currentAngle = Math.max(-maxAngle, Math.min(maxAngle, currentAngle));
 
         wheelKnob.style.transform = 'rotate(' + currentAngle + 'deg)';
 
-        // Map to -32768 .. 32767
         var val = Math.round((currentAngle / maxAngle) * 32767);
         emit(EV_ABS, ABS_X, val);
       }
@@ -179,7 +183,6 @@
 
   function releaseWheel() {
     wheelTrackingId = null;
-    // Auto-center (Optional, could be disabled in preset)
     currentAngle = 0;
     wheelKnob.style.transition = 'transform 0.2s ease-out';
     wheelKnob.style.transform = 'rotate(0deg)';
@@ -196,7 +199,6 @@
     }
   });
 
-  // Also release on touchcancel (phone call, system interrupt, etc.)
   window.addEventListener('touchcancel', function(e) {
     if (wheelTrackingId === null) return;
     for (var i=0; i<e.changedTouches.length; i++) {
@@ -204,9 +206,127 @@
     }
   });
 
+  // --- Camera Joystick (Wheel Center Zone) ---
+  var camJoyActiveId = null;
+  var camJoyKnobEl = null;
+  var camJoyRadius = 0;
+  var camJoyCenterX = 0;
+  var camJoyCenterY = 0;
+
+  function initCameraJoystick() {
+    var zone = document.getElementById('zone-wheel-center');
+    if (!zone) return;
+
+    // Create visual knob element
+    camJoyKnobEl = document.createElement('div');
+    camJoyKnobEl.className = 'camera-knob';
+    zone.appendChild(camJoyKnobEl);
+
+    // Calculate radius and center
+    var updateGeometry = function() {
+      var rect = zone.getBoundingClientRect();
+      camJoyCenterX = rect.width / 2;
+      camJoyCenterY = rect.height / 2;
+      camJoyRadius = Math.min(rect.width, rect.height) / 2 * 0.75; // 75% of half-size
+    };
+    updateGeometry();
+    window.addEventListener('resize', updateGeometry);
+    window.addEventListener('orientationchange', updateGeometry);
+
+    zone.addEventListener('touchstart', function(e) {
+      if (camJoyActiveId !== null) return;
+      var t = e.changedTouches[0];
+      camJoyActiveId = t.identifier;
+      camJoyKnobEl.classList.add('active');
+      updateGeometry();
+      var dx = t.clientX - zone.getBoundingClientRect().left - camJoyCenterX;
+      var dy = t.clientY - zone.getBoundingClientRect().top - camJoyCenterY;
+      updateKnobPosition(dx, dy);
+      e.preventDefault();
+    }, { passive: false });
+
+    window.addEventListener('touchmove', function(e) {
+      if (camJoyActiveId === null) return;
+      for (var i = 0; i < e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === camJoyActiveId) {
+          var rect = zone.getBoundingClientRect();
+          var dx = e.changedTouches[i].clientX - rect.left - camJoyCenterX;
+          var dy = e.changedTouches[i].clientY - rect.top - camJoyCenterY;
+          
+          // Normalize to -1..1
+          var nx = Math.max(-1, Math.min(1, dx / camJoyRadius));
+          var ny = Math.max(-1, Math.min(1, dy / camJoyRadius));
+          
+          // Deadzone 15%
+          if (Math.abs(nx) < 0.15) nx = 0;
+          if (Math.abs(ny) < 0.15) ny = 0;
+
+          // Lefty mode: mirror horizontal
+          var wheelMain = document.querySelector('.wheel-main');
+          if (wheelMain && wheelMain.classList.contains('lefty-mode')) {
+            nx = -nx;
+          }
+
+          // Emit as gamepad right stick (-32767..32767)
+          emit(EV_ABS, ABS_RX, Math.round(nx * 32767));
+          emit(EV_ABS, ABS_RY, Math.round(-ny * 32767)); // Y up = negative
+
+          updateKnobPosition(dx, dy);
+          e.preventDefault();
+          break;
+        }
+      }
+    }, { passive: false });
+
+    function releaseCamJoy() {
+      if (camJoyActiveId === null) return;
+      camJoyActiveId = null;
+      camJoyKnobEl.classList.remove('active');
+      // Return to center visually
+      camJoyKnobEl.style.transform = 'translate(-50%, -50%)';
+      // Emit center
+      emit(EV_ABS, ABS_RX, 0);
+      emit(EV_ABS, ABS_RY, 0);
+    }
+
+    window.addEventListener('touchend', function(e) {
+      for (var i = 0; i < e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === camJoyActiveId) {
+          releaseCamJoy();
+          break;
+        }
+      }
+    });
+
+    window.addEventListener('touchcancel', function(e) {
+      for (var i = 0; i < e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === camJoyActiveId) {
+          releaseCamJoy();
+          break;
+        }
+      }
+    });
+  }
+
+  function updateKnobPosition(dx, dy) {
+    if (!camJoyKnobEl) return;
+    // Clamp to circle
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > camJoyRadius) {
+      dx = dx / dist * camJoyRadius;
+      dy = dy / dist * camJoyRadius;
+    }
+    var zone = document.getElementById('zone-wheel-center');
+    if (!zone) return;
+    var centerX = zone.offsetWidth / 2;
+    var centerY = zone.offsetHeight / 2;
+    // camera-knob is 40% of zone, so center is at 50% - 20% = 30% offset
+    // transform: translate(-50%, -50%) centers it, then we add dx, dy
+    camJoyKnobEl.style.transform = 'translate(' + (centerX + dx - camJoyKnobEl.offsetWidth/2) + 'px, ' + (centerY + dy - camJoyKnobEl.offsetHeight/2) + 'px)';
+  }
+
   // --- Dynamic Buttons ---
   function renderButtons(buttons) {
-    // Clear zones
     const zoneIds = [
       'zone-paddle-left', 'zone-paddle-right', 'zone-wheel-center',
       'slot-left-top', 'slot-left-bot', 'slot-left-mid-bot',
@@ -278,18 +398,15 @@
         currentPreset = data;
         renderButtons(data.buttons || []);
         
-        // Show/hide clutch
         var hasClutch = data.sliders && data.sliders.some(s => s.id === 'clutch' && s.visible);
         document.getElementById('slider-clutch').style.display = hasClutch ? 'flex' : 'none';
         document.getElementById('edit-clutch-toggle').checked = hasClutch;
         
-        // Lefty mode
         document.getElementById('edit-lefty-toggle').checked = !!data.leftyMode;
         var wheelMain = document.querySelector('.wheel-main');
         if(data.leftyMode) wheelMain.classList.add('lefty-mode');
         else wheelMain.classList.remove('lefty-mode');
 
-        // Steering range
         document.getElementById('edit-steering-range').value = data.steeringRange || 180;
         
         document.getElementById('preset-name').value = name;
@@ -366,7 +483,6 @@
     var name = document.getElementById('preset-name').value || 'Custom';
     currentPreset.name = name;
     
-    // Update clutch
     var hasClutch = document.getElementById('edit-clutch-toggle').checked;
     if(!currentPreset.sliders) currentPreset.sliders = [
       { id: "throttle", label: "Throttle", axis: "0x01", visible: true },
@@ -376,7 +492,6 @@
     var c = currentPreset.sliders.find(s=>s.id==='clutch');
     if(c) c.visible = hasClutch;
 
-    // Update new modes
     currentPreset.leftyMode = document.getElementById('edit-lefty-toggle').checked;
     currentPreset.steeringRange = parseInt(document.getElementById('edit-steering-range').value) || 180;
 
@@ -400,7 +515,6 @@
     document.getElementById('wheel-player-banner').textContent = 'Player ' + (padId + 1);
     document.getElementById('wheel-player-banner').className = 'wheel-player-banner wheel-player-connected';
     
-    // Initialize pedals to 0 after 100ms delay so they don't default to 50%
     setTimeout(function() {
       if (currentPreset && currentPreset.sliders) {
         currentPreset.sliders.forEach(function(s) {
@@ -423,6 +537,9 @@
     padId = null;
     location.reload();
   });
+
+  // Initialize camera joystick after DOM ready
+  initCameraJoystick();
 
   // Init
   loadPresetsList();

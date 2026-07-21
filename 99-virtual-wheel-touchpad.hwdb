@@ -1,0 +1,22 @@
+# /etc/udev/hwdb.d/99-virtual-wheel-touchpad.hwdb
+
+# Device path may be /dev/input/by-id or by-path. We use ENV{NAME} for safety.
+# This rule will be loaded by systemd and converted to hwdb binary during `sudo systemd-hwdb update`
+
+# Then rule is applied by `udevadm trigger` or reboot.
+
+# Match virtual wheel device by name present in uinput struct: 'Virtual Racing Wheel'
+evdev:*:NAME="Virtual Racing Wheel":*
+  MOUSE_ABS_REMAP=1
+
+# Evdev property to remap axes 6 (ABS_RX) -> REL_X, 7 (ABS_RY) -> REL_Y (pointer down)
+EVDEV_ABS_REMAP6=ABS_RX:REL_X/1
+EVDEV_ABS_REMAP7=ABS_RY:REL_Y/2:REL_Y/2/-1
+
+# Normal mouse property overrides
+evdev:*:ID_INPUT_MOUSE=1
+
+# Human readable description
+ID_MODEL=VirtualRacingWheel
+``` .hwdb file format is consumed once and compiled into binary hwdb database via: systemd-hwdb update && udevadm control --reload
+ Let me fix the file to standard format (no trailing ```):
